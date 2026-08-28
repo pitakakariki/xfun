@@ -166,6 +166,12 @@ news_tpl = function(news, pkg, ver) {
 #' version `0.59` (or `0.59.0`) is prepended to \file{NEWS.md}.
 #' @export
 post_release = function() {
+  # Make sure gh is installed and token is available
+  message('Checking GitHub CLI, token, and last release ...')
+  vars = set_envvar(c(GH_TOKEN = github_token(TRUE)))
+  on.exit(set_envvar(vars), add = TRUE)
+  gh(c('release', 'list', '--limit', '1'))
+
   desc = read.dcf('DESCRIPTION')
   pkg = desc[, 'Package']
   ver = desc[, 'Version']
@@ -213,7 +219,6 @@ post_release = function() {
   git(c('push', '--tags', 'origin', 'HEAD'))
 
   # Step 5: create GitHub release
-  github_token(TRUE)
   j = grep('^# ', news)
   j = j[j > i]
   end = if (length(j) > 0) j[1] - 1 else length(news)
