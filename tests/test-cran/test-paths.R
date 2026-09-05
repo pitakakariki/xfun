@@ -55,6 +55,7 @@ assert('url_filename() returns the file names in URLs', {
 
 assert('is_abs_path() recognizes absolute paths on Windows and *nix', {
   (!is_abs_path('abc/def'))
+  (!is_abs_path('abc/def/'))
   (is_abs_path(if (.Platform$OS.type == 'windows') {
     c('D:\\abc', '\\\\netdrive\\somewhere')
   } else '/abc/def'))

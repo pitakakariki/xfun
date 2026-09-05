@@ -277,7 +277,7 @@ get_subpath = function(p, n1, n2) {
 #' xfun::is_abs_path(c('C:/foo', 'foo.txt', '/Users/john/', tempdir()))
 #' xfun::is_rel_path(c('C:/foo', 'foo.txt', '/Users/john/', tempdir()))
 is_abs_path = function(x) {
-  if (is_unix()) grepl('^[/~]', x) else !same_path(x, file.path('.', x))
+  if (is_unix()) grepl('^[/~]', x) else !same_path(x, file_path('.', x))
 }
 
 #' @rdname is_abs_path
@@ -397,6 +397,25 @@ magic_path = function(
   } else {
     if (relative) relative_path(f, error = error) else f
   }
+}
+
+#' Construct path to file
+#'
+#' A wrapper function of `file.path` which preserves a trailing slash on Windows.
+#' @param ... character vectors used to construct the path.
+#' @param fsep the path separator to use (assumed to be ASCII).
+#' @export
+#' @examples library(xfun)
+#' file_path("mydir1", "mydir2/")
+file_path = function(..., fsep = .Platform$file.sep) {
+
+  p = file.path(...)
+
+  # preserve trailing slash because file.path() removes it on Windows
+  slash = endsWith(tail(list(...), 1)[[1]], '/')
+  p = ifelse(slash, sub('/*$', '/', p), p)
+
+  p
 }
 
 #' Test the existence of files and directories
